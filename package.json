@@ -10,6 +10,7 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@tektonian/ui": "workspace:*",
     "@react-router/node": "^7.13.0",
     "@react-router/serve": "^7.13.0",
     "@types/mdx": "^2.0.13",
