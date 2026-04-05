@@ -1,0 +1,37 @@
+---
+title: "Benchmark, Environment, Runner, and World"
+description: "Mental model for the core nouns used across the codebase."
+---
+
+# Benchmark, Environment, Runner, and World
+
+Simulac uses a small set of core nouns.
+They are close to Gym-style naming conventions, but there are a few important differences.
+
+## When to use this page
+
+Use this page when you are reading multiple parts of the docs and need one mental model for how environments, runners, and runtime services relate.
+
+## Environment
+
+In Simulac, an `Environment` means the environment definition itself. Compared with a typical Gym-style interface, there are two main differences:
+
+1. Simulac separates the environment definition from the running environment, which appears in the code as a `Runner`.
+2. Simulac also separates the action-receiving entity, whether it is an agent, robot, machine, vehicle, or anything else, from the environment itself.
+
+In a typical Gym-style codebase, environment configuration and environment execution are treated as the same thing.
+That level of complexity is ideal for simple reinforcement learning workflows, but it also couples definition and execution too tightly.
+That tight coupling gets in the way when you want to write logic for domain randomization, share environment definitions, or modify environment configuration cleanly.
+
+In Simulac, an `Environment` object only contains scene-definition information, such as where each object or robot should exist and what should be randomized when `reset()` is called.
+
+
+## Runner
+
+A `Runner` is the live execution environment built from an `Environment` definition. It handles object data, parallelism, randomization, and physics-engine integration such as `mujoco`, `newton`, and `genesis` internally so users can interact with each environment through simple calls like `step()` and `reset()`.
+
+## Randomization
+
+`Randomization` is not implemented yet. The plan is to support basic randomization through Python function objects first, and later allow users to customize environment configuration by running randomization logic inside an isolated `python + wasm` setup.
+
+{/* AI: update the section above once Randomization is implemented. */}

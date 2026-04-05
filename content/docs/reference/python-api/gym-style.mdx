@@ -1,0 +1,48 @@
+---
+title: "Gym-Style Python API"
+description: "Public benchmark-oriented Python surface."
+---
+
+The benchmark-facing Python API is centered on `init_bench()`, `make_vec()`, `BenchmarkEnvironment`, and `BenchmarkVecEnvironment`.
+
+## Module entrypoint
+
+```python
+from simulac.gym_style import BenchmarkEnvironment, BenchmarkVecEnvironment, init_bench, make_vec
+```
+
+## `init_bench()`
+
+```python
+init_bench(
+    benchmark_id: str,
+    env_id: str | None,
+    seed: int = 0,
+    /,
+    benchmark_specific: dict[str, Any] = {},
+)
+```
+
+## `make_vec()`
+
+```python
+make_vec(envs: list[BenchmarkEnvironment])
+```
+
+Wraps a list of single benchmark environments in a vector-style environment that can step and reset in parallel.
+
+## `BenchmarkEnvironment`
+
+Main public methods:
+
+- `step(action: list[float])`
+- `reset(seed: int = 0)`
+- `close()`
+
+## `BenchmarkVecEnvironment`
+
+Main public methods:
+
+- `step(actions: list[list[float]])`
+- `reset(seeds: list[int])`
+

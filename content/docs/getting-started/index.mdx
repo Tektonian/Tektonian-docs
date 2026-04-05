@@ -1,0 +1,96 @@
+---
+title: "Getting Started"
+---
+
+# Installation
+
+## Requirements
+
+- Python 3.10 or later
+- A virtual environment is strongly recommended
+
+## Install commands
+
+```bash
+pip install simulac
+```
+
+If you use `uv`
+
+```bash
+uv add simulac
+```
+
+# Authentication
+
+Remote benchmark execution requires a Tektonian API key, and the SDK supports both a local credential file and an environment-variable override.
+
+## Get API key
+
+Goto [user setting page](https://tektonian.com/account-setting/token) and get an API key first.
+
+## Option 1: save a local API key
+
+The CLI exposes `login` and `logout` through the `simulac` entrypoint:
+
+```bash
+simulac login
+```
+
+Saved keys are written to `~/.cache/simulac/token`
+
+If you want to remove it use `logout` command
+
+```bash
+simulac logout
+```
+
+## Option 2: use an environment variable
+
+The environment-variable service checks `SIMULAC_API_KEY` before it looks for the cached token file.
+
+```bash
+export SIMULAC_API_KEY=tt_sim_your_api_key
+```
+
+That makes the environment variable the highest-precedence auth source for the current shell or process.
+
+# Run Benchmark
+
+## Minimal example
+
+```python
+from simulac.gym_style import init_bench
+
+env = init_bench(
+    "Tektonian/Libero",
+    "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+    0,
+    {"control_mode": "ee_pose"},
+)
+
+step_result = env.step([0.0] * 7)
+reset_result = env.reset(0)
+```
+
+## What each argument does
+
+- `benchmark_id`: the organization and benchmark name, such as `"Tektonian/Libero"`
+- `env_id`: the benchmark environment identifier
+- `seed`: initial seed passed through to environment creation
+- `benchmark_specific`: benchmark-specific options, such as controller mode
+
+## Detail parameter information
+
+This page uses `[0.0] * 7` because the `Libero` example runs in end-effector control mode for a Franka Panda arm, which expects seven action values.
+
+Available `env_id` list and detailed information about `benchmark_specific` can be found on each [benchmark pages](https://tektonian.com/benchmark)
+
+
+## If this fails
+
+Start with these checks:
+
+- your API key is configured
+- your `benchmark_id` includes both owner and benchmark name
+- your `env_id` matches a real task path

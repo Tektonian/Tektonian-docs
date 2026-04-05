@@ -1,0 +1,37 @@
+---
+title: "Environment Variables"
+description: "Supported environment variables"
+---
+
+Simulac reads a small set of environment variables for authentication, endpoint selection, logging, and telemetry behavior.
+
+## Supported variables
+
+| Variable | Purpose | Behavior |
+| --- | --- | --- |
+| `SIMULAC_API_KEY` | Auth override | If set, this value is used before the cached token file. |
+| `SIMULAC_BASE_URL` | Endpoint override | Replaces the default Tektonian API base URL. |
+| `SIMULAC_LOG_LEVEL` | Log verbosity | Accepts `off`, `trace`, `debug`, `info`, `warning`, or `error`. |
+| `SIMULAC_TELEMETRY` | Telemetry control | `off` disables telemetry. |
+
+## Defaults and derived paths
+
+From `EnvvarService`:
+
+- default base URL: `https://tektonian.com/api`
+- token cache path: `~/.cache/simulac/token`
+- asset cache path: `~/.cache/simulac/asset`
+- log file path: `<app_root>/.simulac/log.json`
+
+## Precedence rule for authentication
+
+The token lookup order is:
+
+1. `SIMULAC_API_KEY`
+2. the cached token file at `token_path`
+3. no token, which leads to an authentication error on remote benchmark use
+
+## Telemetry note
+
+Telemetry is skipped when `SIMULAC_TELEMETRY=off`.
+If you want to skip the telemetry, please set to `off`
