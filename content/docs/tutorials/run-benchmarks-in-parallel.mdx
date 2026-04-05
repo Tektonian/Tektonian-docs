@@ -1,0 +1,64 @@
+---
+title: "Run Benchmarks in Parallel"
+description: "Use make_vec() to step multiple environments at once."
+---
+
+Simulac exposes a vector-style benchmark path by wrapping multiple `BenchmarkEnvironment` instances with `make_vec()`.
+
+## Build a small environment list
+
+```python
+from simulac.gym_style import init_bench, make_vec
+
+args = (
+    "Tektonian/Libero",
+    "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+    0,
+)
+
+options = {"benchmark_specific": {"control_mode": "ee_pose"}}
+envs = [init_bench(*args, **options) for _ in range(3)]
+vec_env = make_vec(envs)
+```
+
+## Step every environment together
+
+```python
+results = vec_env.step([[0.0] * 7 for _ in envs])
+print(len(results))
+```
+
+The vector environment returns results in the same order as the provided environment list. That ordering is enforced explicitly in the implementation by storing receive futures back into a result array by index.
+
+## Run different benchmarks in parallel
+
+You can run environments from any benchmark in parallel, regardless of benchmark type.
+
+When you call `step()` or `reset()`, you only need to make sure the action dimensions and action ordering match each environment. Once those inputs are aligned, you can process different benchmark types in parallel through the same vector environment.
+
+```python
+from simulac.gym_style import init_bench, make_vec
+
+libero_args = (
+    "Tektonian/Libero",
+    "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+    0,
+)
+libero_options = {"benchmark_specific": {"control_mode": "ee_pose"}}
+
+libero_env = init_bench(*libero_args, **libero_options)
+
+robomimic_args = (
+    "Tektonian/Robomimic",
+    "PickPlaceCan",
+    0
+)
+
+robomimic_env = init_bench(*robomimic_args)
+vec_env = make_vec([libero_env, robomimic_env])
+```
+
+## Resetting multiple environments
+
+`BenchmarkVecEnvironment.reset()` accepts a list of seeds and sends reset commands in parallel. Use a seed list whose length matches the environment count.
+

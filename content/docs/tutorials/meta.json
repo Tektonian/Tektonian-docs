@@ -1,0 +1,9 @@
+{
+  "title": "Tutorials",
+  "pages": [
+    "index",
+    "run-your-first-remote-benchmark",
+    "run-benchmarks-in-parallel",
+    "build-your-first-environment"
+  ]
+}

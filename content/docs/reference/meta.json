@@ -1,0 +1,9 @@
+{
+  "title": "Reference",
+  "pages": [
+    "index",
+    "python-api",
+    "cli",
+    "environment-variables"
+  ]
+}

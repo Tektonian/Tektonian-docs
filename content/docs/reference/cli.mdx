@@ -1,0 +1,24 @@
+---
+title: "CLI Reference"
+description: "Exact behavior of the simulac command-line interface."
+---
+
+## Global behavior
+
+- `simulac --version` prints the installed package version and exits.
+- The CLI help text points new users toward `simulac login`.
+
+## `simulac login`
+
+Saves a Simulac API key in the local credential cache.
+
+### Options
+
+| Option | Meaning |
+| --- | --- |
+| `--apikey` | API key value to save |
+| `-k` | Short alias for `--apikey` |
+
+## `simulac logout`
+
+Deletes the local credential file created by `simulac login`.

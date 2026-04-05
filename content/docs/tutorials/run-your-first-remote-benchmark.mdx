@@ -1,0 +1,56 @@
+---
+title: "Run Your First Remote Benchmark"
+description: "Hands-on tutorial for a first successful remote environment run."
+---
+
+This tutorial walks through the first remote benchmark run from install-ready environment to a returned step payload.
+
+## Step 1: import the public benchmark surface
+
+```python
+from simulac.gym_style import init_bench
+```
+
+## Step 2: initialize a real benchmark
+
+```python
+env = init_bench(
+    "Tektonian/Libero",
+    "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+    0,
+    {"control_mode": "ee_pose"},
+)
+```
+
+## Step 3: send a first action
+
+```python
+step_result = env.step([0.0] * 7)
+```
+
+## Step 4: inspect the returned payload
+
+The returned payload is shaped to preserve each benchmark's original return values as much as possible while keeping the overall structure consistent across benchmarks.
+Because most benchmarks follow the Gym-style interface, the returned payload also follows Gym-style conventions for consistency.
+
+- `obs`
+- `reward`
+- `termination`
+- `truncation`
+- `info`
+
+You can find the exact contents of each field on the benchmark page.
+
+## Step 5: confirm reset behavior
+
+```python
+reset_result = env.reset(0)
+```
+
+You can reset the benchmark environment with different seed.
+
+## If you get blocked
+
+- Missing API key: verify auth first.
+- Connection failure: check network status first, since `Simulac` operates network intensive works, network stability is very important.
+- Wrong IDs: verify `benchmark_id` and `env_id` formatting.

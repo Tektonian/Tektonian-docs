@@ -1,0 +1,44 @@
+---
+title: "Build Your First Environment"
+description: "‼️Alpha - Create a local environment, place entities, and step a runner."
+---
+
+This tutorial introduces the experimental local environment setting flows.
+
+## Experimental status first
+
+The local `Environment`, `Stuff`, and `Runner` path is still evolving. Treat it as a foundation for experimentation, not as a finished public product surface.
+
+## 1. Import the local building blocks
+
+```python
+from simulac import Environment, Runner, Stuff
+```
+
+## 2. Create an environment and one asset entity
+
+```python
+env = Environment()
+basket = Stuff("trash/assets/asset/test/Basket/Basket026/model.xml")
+```
+
+The `Stuff` constructor currently accepts a string named `obj_uri_or_prebuilt_name`.
+
+## 3. Place entities into the environment
+
+```python
+basket_obj1 = env.place_entity(basket, (1, 0, 0))
+basket_obj2 = env.place_entity(basket, (0, 1, 0))
+```
+
+That is the exact placement pattern used in `entity_test.py`.
+
+## 4. Create a runner and step it
+
+```python
+runner = Runner(env)
+runner.step([])
+```
+
+This is the smallest confirmed local execution loop in the repository.
+
