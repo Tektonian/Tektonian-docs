@@ -3,8 +3,8 @@
   "root": true,
   "pages": [
     "index",
-    "concepts",
     "getting-started",
+    "concepts",
     "reference",
     "tutorials"
   ]
