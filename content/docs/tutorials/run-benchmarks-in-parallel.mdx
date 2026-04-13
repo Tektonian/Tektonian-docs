@@ -4,13 +4,13 @@ title: "Run Benchmarks in Parallel"
 description: "Step multiple environments at once with make_vec()."
 ------------------------------------------------------------------
 
-Run multiple benchmark environments in parallel with a single API.
+Run multiple benchmark environments in parallel with a single API to increase throughput and scale experiments easily.
 
 `make_vec()` wraps multiple environments and lets you step them together, making it easy to scale from one environment to many.
 
 ---
 
-## Step1: build a vector environment
+## Step 1: build a vector environment
 
 ```python
 from simulac.gym_style import init_bench, make_vec
@@ -30,19 +30,7 @@ vec_env = make_vec(envs)
 
 ---
 
-## Step2: step all environments at once
-
-```python
-results = vec_env.step([[0.0] * 7 for _ in envs])
-print(len(results))  # 3
-```
-
-* One action per environment
-* Results are returned in the same order as the input list
-
----
-
-## Step3: Reset multiple environments
+## Step 2: reset a vector environment
 
 ```python
 seeds = [0, 1, 2]
@@ -54,9 +42,60 @@ results = vec_env.reset(seeds)
 
 ---
 
-## Step4: Mix different benchmarks
+## Step 3: step all environments at once
 
-You can run different benchmark types in the same vector environment.
+```python
+results = vec_env.step([[0.0] * 7 for _ in envs])
+print(len(results))  # 3
+```
+
+* One action per environment (list length must match number of environments)
+* Results are returned in the same order as the input list
+
+---
+
+## Step 4: run a full benchmark in parallel
+
+You can run all tasks in a benchmark as a single vectorized batch.
+
+```python
+from simulac.gym_style import init_bench, make_vec, get_env_list
+
+# Get all task IDs in the benchmark
+env_ids = get_env_list("Tektonian/Libero")
+print(len(env_ids)) # 130
+
+# Initialize environments
+envs = [
+    init_bench(
+        "Tektonian/Libero",
+        env_id,
+        0,
+        {"control_mode": "OSC_POSE"},
+    )
+    for env_id in env_ids
+]
+
+vec_env = make_vec(envs)
+
+n_envs = len(envs)
+print(f"Initialized {n_envs} environments.")
+
+# Reset and step
+vec_env.reset([0] * n_envs)
+results = vec_env.step([[0.0] * 7 for _ in range(n_envs)])
+```
+
+Make sure:
+
+* action dimensions match each environment
+* action ordering aligns with the environment list
+
+---
+
+## Step 5: mix different benchmarks
+
+You can mix completely different benchmark types in a single vector environment.
 
 ```python
 from simulac.gym_style import init_bench, make_vec
@@ -88,3 +127,4 @@ Make sure:
 
 * `make_vec()` is useful for scaling experiments and increasing throughput
 * You can treat it as a drop-in extension of the single-environment API
+* Parallel execution is handled internally (no async code required)
