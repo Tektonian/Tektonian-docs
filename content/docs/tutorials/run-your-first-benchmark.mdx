@@ -1,0 +1,68 @@
+---
+
+title: "Run Your First Benchmark"
+description: "Hands-on tutorial for your first successful environment run."
+---------------------------------------------------------------------------
+
+This tutorial walks you through your first benchmark run from a run-ready setup to a valid step result.
+
+---
+
+## Step 1: initialize a benchmark
+
+```python
+from simulac.gym_style import init_bench
+
+env = init_bench(
+    "Tektonian/Libero",
+    "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+    0,
+    {"control_mode": "OSC_POSE"},
+)
+```
+
+---
+
+## Step 2: reset the environment
+
+```python
+reset_result = env.reset(0)
+```
+
+You can reset the environment with a different seed.
+
+---
+
+## Step 3: send a first action
+
+```python
+step_result = env.step([0.0] * 7)
+print(step_result)
+```
+
+If this runs without error, your benchmark is successfully connected.
+
+---
+
+## Step 4: understand the returned payload
+
+The result follows a Gym-style structure:
+
+* `obs`: observation
+* `reward`: float
+* `done`: bool
+* `info`: dict
+
+You can inspect it directly:
+
+```python
+print(step_result.keys())
+```
+
+---
+
+## If you get blocked
+
+* **Missing API key** → verify authentication
+* **Connection failure** → ensure a stable network connection
+* **Wrong IDs** → check `benchmark_id` and `env_id` formatting
