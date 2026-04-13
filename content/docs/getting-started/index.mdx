@@ -2,78 +2,120 @@
 title: "Getting Started"
 ---
 
-# Installation
+## Quickstart
+
+Run a benchmark immediately (no signup required):
+
+```bash
+pip install simulac
+simulac login --apikey tt_sim_dQFjGXCwIILiYqBhSExziOFqpRScaUuEeqrBLBnMOMufxdqahybkfuScuadZQlUh
+```
+
+```python
+from simulac.gym_style import init_bench
+
+env = init_bench(
+    "Tektonian/Libero",
+    "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+    0,
+    {"control_mode": "OSC_POSE"},
+)
+
+env.reset(0)
+env.step([0.0] * 7)
+```
+
+* No account required
+* Demo key works with `Tektonian/Libero` only
+
+---
+
+# 1. Install
 
 ## Requirements
 
-- Python 3.10 or later
-- A virtual environment is strongly recommended
+* Python 3.10 or later
+* A virtual environment is recommended
 
-## Install commands
+Install with `pip`:
 
 ```bash
 pip install simulac
 ```
 
-If you use `uv`
+If you use `uv`:
 
 ```bash
 uv add simulac
 ```
 
-# Authentication
+---
 
-Remote benchmark execution requires a Tektonian API key, and the SDK supports both a local credential file and an environment-variable override.
+# 2. Authenticate
 
-## Use working demo key before signin
+Remote benchmark execution requires a Tektonian API key.
 
-> This is a real working demo key for demostration
->
-> Use the key below, before you signup
->
-> It works only with `Tektonian/Libero`.
+The SDK checks:
 
-```text
-tt_sim_dQFjGXCwIILiYqBhSExziOFqpRScaUuEeqrBLBnMOMufxdqahybkfuScuadZQlUh
-```
+1. `SIMULAC_API_KEY` (environment variable)
+2. Local key stored at `~/.cache/simulac/token`
 
-Save it locally with:
+---
+
+## Try the demo key (no signup)
+
+You can test the SDK before creating an account.
 
 ```bash
 simulac login --apikey tt_sim_dQFjGXCwIILiYqBhSExziOFqpRScaUuEeqrBLBnMOMufxdqahybkfuScuadZQlUh
 ```
 
-## Get API key
+* Works only with `Tektonian/Libero`
+* Intended for evaluation purposes
 
-Go to [user setting page](https://tektonian.com/account-setting/token) and get an API key first.
+---
 
-## Option 1: save a local API key
+## Get your own API key
 
-The CLI exposes `login` and `logout` through the `simulac` entrypoint:
+Create or copy your API key from:
+
+https://tektonian.com/account-setting/token
+
+---
+
+## Set your API key
+
+### Option 1: save locally
 
 ```bash
 simulac login
 ```
 
-Saved keys are written to `~/.cache/simulac/token`
+Stored at:
 
-If you want to remove it use `logout` command
+```text
+~/.cache/simulac/token
+```
+
+Remove it with:
 
 ```bash
 simulac logout
 ```
 
-## Option 2: use an environment variable
+---
 
-The environment-variable service checks `SIMULAC_API_KEY` before it looks for the cached token file.
+### Option 2: use environment variable
 
 ```bash
 export SIMULAC_API_KEY=tt_sim_your_api_key
 ```
 
-That makes the environment variable the highest-precedence auth source for the current shell or process.
+This takes precedence over the local key.
 
-# Run Benchmark
+---
+
+# 3. Run Benchmark
 
 ## Minimal example
 
@@ -84,31 +126,38 @@ env = init_bench(
     "Tektonian/Libero",
     "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
     0,
-    {"control_mode": "ee_pose"},
+    {"control_mode": "OSC_POSE"},
 )
 
-step_result = env.step([0.0] * 7)
 reset_result = env.reset(0)
+step_result = env.step([0.0] * 7)
 ```
 
-## What each argument does
+---
 
-- `benchmark_id`: the organization and benchmark name, such as `"Tektonian/Libero"`
-- `env_id`: the benchmark environment identifier
-- `seed`: initial seed passed through to environment creation
-- `benchmark_specific`: benchmark-specific options, such as controller mode
+## What the arguments mean
 
-## Detail parameter information
+* `benchmark_id`: includes owner and benchmark name (e.g. `"Tektonian/Libero"`)
+* `env_id`: task identifier within the benchmark
+* `seed`: random seed for environment initialization
+* `benchmark_specific`: benchmark-specific options (e.g. control mode)
 
-This page uses `[0.0] * 7` because the `Libero` example runs in end-effector control mode for a Franka Panda arm, which expects seven action values.
+---
 
-Available `env_id` list and detailed information about `benchmark_specific` can be found on each [benchmark pages](https://tektonian.com/benchmark)
+## Notes
 
+This example uses `[0.0] * 7` because the `Libero` benchmark runs a Franka Panda arm in end-effector control mode, which expects a 7D action vector.
 
-## If this fails
+Available environments and options:
 
-Start with these checks:
+https://tektonian.com/benchmark
 
-- your API key is configured
-- your `benchmark_id` includes both owner and benchmark name
-- your `env_id` matches a real task path
+---
+
+# Troubleshooting
+
+If it does not run, check:
+
+* API key is configured correctly
+* `benchmark_id` format is valid
+* `env_id` matches a real task
