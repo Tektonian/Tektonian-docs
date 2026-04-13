@@ -1,64 +1,90 @@
 ---
+
 title: "Run Benchmarks in Parallel"
-description: "Use make_vec() to step multiple environments at once."
+description: "Step multiple environments at once with make_vec()."
+------------------------------------------------------------------
+
+Run multiple benchmark environments in parallel with a single API.
+
+`make_vec()` wraps multiple environments and lets you step them together, making it easy to scale from one environment to many.
+
 ---
 
-Simulac exposes a vector-style benchmark path by wrapping multiple `BenchmarkEnvironment` instances with `make_vec()`.
-
-## Build a small environment list
+## Step1: build a vector environment
 
 ```python
 from simulac.gym_style import init_bench, make_vec
 
-args = (
-    "Tektonian/Libero",
-    "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
-    0,
-)
+envs = [
+    init_bench(
+        "Tektonian/Libero",
+        "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+        0,
+        {"control_mode": "OSC_POSE"},
+    )
+    for _ in range(3)
+]
 
-options = {"benchmark_specific": {"control_mode": "ee_pose"}}
-envs = [init_bench(*args, **options) for _ in range(3)]
 vec_env = make_vec(envs)
 ```
 
-## Step every environment together
+---
+
+## Step2: step all environments at once
 
 ```python
 results = vec_env.step([[0.0] * 7 for _ in envs])
-print(len(results))
+print(len(results))  # 3
 ```
 
-The vector environment returns results in the same order as the provided environment list. That ordering is enforced explicitly in the implementation by storing receive futures back into a result array by index.
+* One action per environment
+* Results are returned in the same order as the input list
 
-## Run different benchmarks in parallel
+---
 
-You can run environments from any benchmark in parallel, regardless of benchmark type.
+## Step3: Reset multiple environments
 
-When you call `step()` or `reset()`, you only need to make sure the action dimensions and action ordering match each environment. Once those inputs are aligned, you can process different benchmark types in parallel through the same vector environment.
+```python
+seeds = [0, 1, 2]
+results = vec_env.reset(seeds)
+```
+
+* Provide one seed per environment
+* Resets are executed in parallel
+
+---
+
+## Step4: Mix different benchmarks
+
+You can run different benchmark types in the same vector environment.
 
 ```python
 from simulac.gym_style import init_bench, make_vec
 
-libero_args = (
+libero_env = init_bench(
     "Tektonian/Libero",
     "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
     0,
+    {"control_mode": "OSC_POSE"},
 )
-libero_options = {"benchmark_specific": {"control_mode": "ee_pose"}}
 
-libero_env = init_bench(*libero_args, **libero_options)
-
-robomimic_args = (
+robomimic_env = init_bench(
     "Tektonian/Robomimic",
     "PickPlaceCan",
-    0
+    0,
 )
 
-robomimic_env = init_bench(*robomimic_args)
 vec_env = make_vec([libero_env, robomimic_env])
 ```
 
-## Resetting multiple environments
+Make sure:
 
-`BenchmarkVecEnvironment.reset()` accepts a list of seeds and sends reset commands in parallel. Use a seed list whose length matches the environment count.
+* action dimensions match each environment
+* action ordering aligns with the environment list
 
+---
+
+## Notes
+
+* `make_vec()` is useful for scaling experiments and increasing throughput
+* You can treat it as a drop-in extension of the single-environment API
