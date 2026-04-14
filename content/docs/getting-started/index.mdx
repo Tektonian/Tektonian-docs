@@ -15,18 +15,21 @@ simulac login --apikey tt_sim_dQFjGXCwIILiYqBhSExziOFqpRScaUuEeqrBLBnMOMufxdqahy
 from simulac.gym_style import init_bench
 
 env = init_bench(
-    "Tektonian/Libero",
-    "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+    "Tektonian/Metaworld",
+    "assembly-v3",
     0,
-    {"control_mode": "OSC_POSE"},
 )
 
-env.reset(0)
-env.step([0.0] * 7)
+reset_result = env.reset(0)
+for _ in range(10):
+    step_result = env.step([0.0] * 4)
+    obs, reward, done, info = step_result
+
+env.close()
 ```
 
 * No account required
-* Demo key works with `Tektonian/Libero` only
+* Demo key works with `Tektonian/Metaworld` only
 
 ---
 
@@ -70,7 +73,7 @@ You can test the SDK before creating an account.
 simulac login --apikey tt_sim_dQFjGXCwIILiYqBhSExziOFqpRScaUuEeqrBLBnMOMufxdqahybkfuScuadZQlUh
 ```
 
-* Works only with `Tektonian/Libero`
+* Works only with `Tektonian/Metaworld`
 * Intended for evaluation purposes
 
 ---
@@ -123,21 +126,24 @@ This takes precedence over the local key.
 from simulac.gym_style import init_bench
 
 env = init_bench(
-    "Tektonian/Libero",
-    "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+    "Tektonian/Metaworld",
+    "assembly-v3",
     0,
-    {"control_mode": "OSC_POSE"},
 )
 
 reset_result = env.reset(0)
-step_result = env.step([0.0] * 7)
+for _ in range(10):
+    step_result = env.step([0.0] * 4)
+    obs, reward, done, info = step_result
+
+env.close()
 ```
 
 ---
 
 ## What the arguments mean
 
-* `benchmark_id`: includes owner and benchmark name (e.g. `"Tektonian/Libero"`)
+* `benchmark_id`: includes owner and benchmark name (e.g. `"Tektonian/Metaworld"`)
 * `env_id`: task identifier within the benchmark
 * `seed`: random seed for environment initialization
 * `benchmark_specific`: benchmark-specific options (e.g. control mode)
@@ -146,7 +152,7 @@ step_result = env.step([0.0] * 7)
 
 ## Notes
 
-This example uses `[0.0] * 7` because the `Libero` benchmark runs a Franka Panda arm in end-effector control mode, which expects a 7D action vector.
+This example uses `[0.0] * 4` because the `Metaworld` benchmark runs a end-effector control mode. [Check this page for more information](https://metaworld.farama.org/benchmark/action_space/)
 
 Available environments and options:
 

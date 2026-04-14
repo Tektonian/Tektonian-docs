@@ -17,10 +17,10 @@ from simulac.gym_style import init_bench, make_vec
 
 envs = [
     init_bench(
-        "Tektonian/Libero",
-        "libero_90/KITCHEN_SCENE2_put_the_black_bowl_at_the_back_on_the_plate",
+        "Tektonian/Metaworld",
+        "assembly-v3",
         0,
-        {"control_mode": "OSC_POSE"},
+        {}
     )
     for _ in range(3)
 ]
@@ -62,16 +62,16 @@ You can run all tasks in a benchmark as a single vectorized batch.
 from simulac.gym_style import init_bench, make_vec, get_env_list
 
 # Get all task IDs in the benchmark
-env_ids = get_env_list("Tektonian/Libero")
-print(len(env_ids)) # 130
+env_ids = get_env_list("Tektonian/Metaworld")
+print(len(env_ids)) # 50
 
 # Initialize environments
 envs = [
     init_bench(
-        "Tektonian/Libero",
+        "Tektonian/Metaworld",
         env_id,
         0,
-        {"control_mode": "OSC_POSE"},
+        {},
     )
     for env_id in env_ids
 ]
@@ -83,7 +83,7 @@ print(f"Initialized {n_envs} environments.")
 
 # Reset and step
 vec_env.reset([0] * n_envs)
-results = vec_env.step([[0.0] * 7 for _ in range(n_envs)])
+results = vec_env.step([[0.0] * 4 for _ in range(n_envs)])
 ```
 
 Make sure:
