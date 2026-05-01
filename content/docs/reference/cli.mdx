@@ -6,9 +6,9 @@ description: "Exact behavior of the simulac command-line interface."
 ## Global behavior
 
 - `simulac --version` prints the installed package version and exits.
-- The CLI help text points new users toward `simulac login`.
+- The CLI help text points new users toward `simulac auth login`.
 
-## `simulac login`
+## `simulac auth login`
 
 Saves a Simulac API key in the local credential cache.
 
@@ -19,6 +19,6 @@ Saves a Simulac API key in the local credential cache.
 | `--apikey` | API key value to save |
 | `-k` | Short alias for `--apikey` |
 
-## `simulac logout`
+## `simulac auth logout`
 
-Deletes the local credential file created by `simulac login`.
+Deletes the local credential file created by `simulac auth login`.

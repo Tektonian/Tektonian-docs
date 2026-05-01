@@ -8,7 +8,7 @@ Run a benchmark immediately (no signup required):
 
 ```bash
 pip install simulac
-simulac login --apikey tt_sim_dQFjGXCwIILiYqBhSExziOFqpRScaUuEeqrBLBnMOMufxdqahybkfuScuadZQlUh
+simulac auth login --apikey tt_sim_dQFjGXCwIILiYqBhSExziOFqpRScaUuEeqrBLBnMOMufxdqahybkfuScuadZQlUh
 ```
 
 ```python
@@ -70,7 +70,7 @@ The SDK checks:
 You can test the SDK before creating an account.
 
 ```bash
-simulac login --apikey tt_sim_dQFjGXCwIILiYqBhSExziOFqpRScaUuEeqrBLBnMOMufxdqahybkfuScuadZQlUh
+simulac auth login --apikey tt_sim_dQFjGXCwIILiYqBhSExziOFqpRScaUuEeqrBLBnMOMufxdqahybkfuScuadZQlUh
 ```
 
 * Works only with `Tektonian/Metaworld`
@@ -91,7 +91,7 @@ https://tektonian.com/account-setting/token
 ### Option 1: save locally
 
 ```bash
-simulac login
+simulac auth login
 ```
 
 Stored at:
@@ -103,7 +103,7 @@ Stored at:
 Remove it with:
 
 ```bash
-simulac logout
+simulac auth logout
 ```
 
 ---
