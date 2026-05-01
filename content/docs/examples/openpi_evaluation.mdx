@@ -1,0 +1,235 @@
+---
+title: "Evaluation OpenPI on RoboCasa"
+description: "Evaluate the RoboCasa OpenPI checkpoints (pi0, pi0.5) with Simulac."
+---
+
+
+## Benchmark Results and Checkpoints
+
+The RoboCasa benchmark reports average task success rate in percent. This tutorial focuses on the OpenPI pi0 and pi0.5 checkpoints used for Simulac evaluation.
+
+| Task Split | pi0 | pi0.5 |
+| --- | ---: | ---: |
+| Atomic-Seen | 34.6% | 39.6% |
+| Composite-Seen | 6.1% | 7.1% |
+| Composite-Unseen | 1.1% | 1.2% |
+| Average | 14.8% | 16.9% |
+| Model Checkpoint | [Link](https://huggingface.co/robocasa/robocasa365_checkpoints/tree/main/pi0/pi0_robocasa_pretrain_human300/multitask_learning/75000) | [Link](https://huggingface.co/robocasa/robocasa365_checkpoints/tree/main/pi05_pretrain_human300/multitask_learning/75000) |
+
+## What This Tutorial Does
+
+This tutorial evaluates RoboCasa OpenPI checkpoints on Simulac with one vectorized evaluator:
+
+- [`example_eval_robocasa_openpi.py`](https://github.com/Tektonian/Simulac/tree/main/scripts/example_eval_robocasa_openpi.py)
+
+You will:
+
+1. Create an isolated example venv.
+2. Check OpenPI imports and Simulac access.
+3. Inspect one RoboCasa observation.
+4. Get the example evaluator script.
+5. Run a short evaluation.
+6. Run the full pi0 evaluation.
+7. Run the full pi0.5 evaluation.
+8. Review the observation and action mapping.
+
+Outputs are written to:
+
+```text
+.logs/
+```
+
+## Prerequisites
+
+You need:
+
+- [`uv`](https://docs.astral.sh/uv/getting-started/installation/)
+- [Simulac access](/docs/getting-started)
+- [A valid Simulac auth token](https://tektonian.com/account-setting/token)
+
+
+## 1. Create the Example Venv
+
+Use Python 3.13 (tested) by default.
+
+```bash
+uv venv .venv-robocasa-example --python python3.13
+source .venv-robocasa-example/bin/activate
+```
+
+Install OpenPI from the pinned commit with `--no-deps`. 
+
+```bash
+uv pip install --python .venv-robocasa-example/bin/python \
+  "openpi @ git+https://github.com/Physical-Intelligence/openpi.git@650c5b0283a49c42784fb5055a0507da2c6d347d" \
+  "openpi-client @ git+https://github.com/Physical-Intelligence/openpi.git@650c5b0283a49c42784fb5055a0507da2c6d347d#subdirectory=packages/openpi-client" \
+  --no-deps
+```
+
+Install Simulac and the runtime packages.
+
+```bash
+uv pip install --python .venv-robocasa-example/bin/python \
+  simulac \
+  "pydantic<3" "duckdb>=1.4" "structlog>=25.5.0" "mujoco>=3.7.0" \
+  "websockets>=15.0.1" "typer>=0.24.1" "zstd>=1.5.7.3" "msgpack>=1.1.2" \
+  requests numpy pillow opencv-python tqdm "huggingface-hub>=0.30.0,<1.0" \
+  jax==0.5.3 jaxlib==0.5.3 flax==0.10.2 orbax-checkpoint==0.11.13 \
+  optax==0.2.8 chex transformers==4.53.2 tokenizers==0.21.4 sentencepiece \
+  einops ml-collections augmax tqdm-loggable beartype==0.19.0 \
+  jaxtyping==0.2.36 typeguard wadler-lindig numpydantic==1.8.1 \
+  tree==0.2.4 dm-tree==0.1.10 polars==1.40.1 polars-runtime-32==1.40.1 \
+  glfw pyopengl torch==2.7.1
+```
+
+## 2. Smoke Test Imports and Simulac Access
+
+```bash
+python - <<'PY'
+from openpi import transforms
+from openpi_client import image_tools
+from simulac.gym_style import get_env_list
+
+envs = get_env_list("Tektonian/RobocasaPre")
+print("OpenPI imports ok")
+print("RoboCasa envs:", len(envs))
+print("First env:", envs[0])
+PY
+```
+
+Expected:
+
+```text
+OpenPI imports ok
+RoboCasa envs: 50
+First env: Atomic/Seen/CloseBlenderLid
+```
+
+## 3. Smoke Test One Observation
+
+This verifies that Simulac returns the image keys and image format expected by the examples.
+
+```bash
+python - <<'PY'
+import numpy as np
+from simulac.gym_style import get_env_list, init_bench
+
+benchmark_id = "Tektonian/RobocasaPre"
+env_path = get_env_list(benchmark_id)[0]
+env_id = env_path.split("/")[-1]
+
+env = init_bench(benchmark_id, env_id)
+try:
+    obs, info = env.reset(0)
+    print(env_path)
+    print(info["task_description"])
+    for camera, image in obs["images"].items():
+        image = np.asarray(image)
+        print(camera, image.shape, image.dtype, image.min(), image.max())
+finally:
+    env.close()
+PY
+```
+
+Expected output:
+
+```text
+cam_0_rgb (256, 256, 3) int64
+cam_1_rgb (256, 256, 3) int64
+cam_2_rgb (256, 256, 3) int64
+```
+
+The examples convert these images to contiguous `uint8` RGB arrays before passing them to OpenPI or OpenCV.
+
+## 4. Get the Example Script
+
+Use the RoboCasa OpenPI evaluator from the Simulac repository:
+
+[`example_eval_robocasa_openpi.py`](https://github.com/Tektonian/Simulac/tree/main/scripts/example_eval_robocasa_openpi.py)
+
+Download or copy this script into your working directory before running the commands below.
+
+## 5. Run a Short Evaluation
+
+Before a full evaluation, run one episode per task with one environment copy at a time.
+
+```bash
+python example_eval_robocasa_openpi.py \
+  --model-name pi0 \
+  --episodes-per-env 1 \
+  --max-vec-envs 1
+```
+
+The first OpenPI policy call can be slow because JAX compiles the model.
+
+## 6. Run the pi0 Evaluation
+
+```bash
+python example_eval_robocasa_openpi.py \
+  --model-name pi0 \
+  --episodes-per-env 50 \
+  --max-vec-envs 2
+```
+
+The evaluator:
+
+1. Downloads the pi0 checkpoint if needed.
+2. Loads the OpenPI policy.
+3. Converts Simulac observations to OpenPI inputs.
+4. Runs seeded task copies in vectorized batches.
+5. Saves one JSONL result per task.
+6. Saves MP4 videos from `cam_0_rgb`.
+
+Typical output files:
+
+```text
+.logs/robocasa_pi0_benchmark_<RUN_ID>.log
+.logs/robocasa_pi0_benchmark_results_<RUN_ID>.jsonl
+.logs/robocasa_pi0_benchmark_videos_<RUN_ID>/*.mp4
+```
+
+Use the videos first when debugging policy behavior.
+
+## 7. Run the pi0.5 Evaluation
+
+Use the same evaluator with `--model-name pi05`:
+
+```bash
+python example_eval_robocasa_openpi.py \
+  --model-name pi05 \
+  --episodes-per-env 50 \
+  --max-vec-envs 2
+```
+
+Typical pi0.5 output files:
+
+```text
+.logs/robocasa_pi05_benchmark_<RUN_ID>.log
+.logs/robocasa_pi05_benchmark_results_<RUN_ID>.jsonl
+.logs/robocasa_pi05_benchmark_videos_<RUN_ID>/*.mp4
+```
+
+## 8. Observation and Action Mapping
+
+Simulac provides observation data through:
+
+- `obs["images"]["cam_0_rgb"]`
+- `obs["images"]["cam_2_rgb"]`
+- robot state values in `obs["states"]`
+- the language prompt in `info["task_description"]`
+
+OpenPI receives:
+
+- `observation/image` from `cam_0_rgb`
+- `observation/wrist_image` from `cam_2_rgb`
+- `observation/state` from concatenated robot state
+- `prompt` from `info["task_description"]`
+
+The examples convert Simulac images to contiguous `uint8` RGB arrays before model inference and video writing.
+
+Keep the action dimensions separate:
+
+- `ACTION_DIM = 12`: action vector sent to Simulac.
+- `MODEL_ACTION_DIM = 32`: padded OpenPI model action width.
+
+OpenPI predicts using the padded model action width. The evaluator converts the model output into the 12-dimensional Simulac action vector before calling `env.step(...)`.
