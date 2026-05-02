@@ -20,7 +20,7 @@ The RoboCasa benchmark reports average task success rate in percent. This tutori
 
 This tutorial evaluates RoboCasa OpenPI checkpoints on Simulac with one vectorized evaluator:
 
-- [`example_eval_robocasa_openpi.py`](https://github.com/Tektonian/Simulac/tree/main/scripts/example_eval_robocasa_openpi.py)
+- [`eval_robocasa_openpi.py`](/docs/publish/examples/eval/eval_robocasa_openpi.py)
 
 You will:
 
@@ -145,7 +145,7 @@ The examples convert these images to contiguous `uint8` RGB arrays before passin
 
 Use the RoboCasa OpenPI evaluator from the Simulac repository:
 
-[`example_eval_robocasa_openpi.py`](https://github.com/Tektonian/Simulac/tree/main/scripts/example_eval_robocasa_openpi.py)
+- [`eval_robocasa_openpi.py`](/docs/publish/examples/eval/eval_robocasa_openpi.py)
 
 Download or copy this script into your working directory before running the commands below.
 
@@ -154,7 +154,7 @@ Download or copy this script into your working directory before running the comm
 Before a full evaluation, run one episode per task with one environment copy at a time.
 
 ```bash
-python example_eval_robocasa_openpi.py \
+python eval_robocasa_openpi.py \
   --model-name pi0 \
   --episodes-per-env 1 \
   --max-vec-envs 1
@@ -165,7 +165,7 @@ The first OpenPI policy call can be slow because JAX compiles the model.
 ## 6. Run the pi0 Evaluation
 
 ```bash
-python example_eval_robocasa_openpi.py \
+python eval_robocasa_openpi.py \
   --model-name pi0 \
   --episodes-per-env 50 \
   --max-vec-envs 2
@@ -195,7 +195,7 @@ Use the videos first when debugging policy behavior.
 Use the same evaluator with `--model-name pi05`:
 
 ```bash
-python example_eval_robocasa_openpi.py \
+python eval_robocasa_openpi.py \
   --model-name pi05 \
   --episodes-per-env 50 \
   --max-vec-envs 2
