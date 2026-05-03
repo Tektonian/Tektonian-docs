@@ -3,33 +3,49 @@ title: "Gym-Style Python API"
 description: "Public benchmark-oriented Python surface."
 ---
 
-The benchmark-facing Python API is centered on `init_bench()`, `make_vec()`, `BenchmarkEnvironment`, and `BenchmarkVecEnvironment`.
+The benchmark-facing Python API is centered on `get_env_list()`, `init_bench()`, `make_vec()`, `BenchmarkEnvironment`, and `BenchmarkVecEnvironment`.
 
 ## Module entrypoint
 
 ```python
-from simulac.gym_style import BenchmarkEnvironment, BenchmarkVecEnvironment, init_bench, make_vec
+from simulac.gym_style import (
+    BenchmarkEnvironment,
+    BenchmarkVecEnvironment,
+    get_env_list,
+    init_bench,
+    make_vec,
+)
 ```
+
+## `get_env_list()`
+
+```python
+get_env_list(
+    benchmark_id: str,
+) -> list[str]
+```
+
+Returns a list of environment IDs available under a benchmark.
 
 ## `init_bench()`
 
 ```python
 init_bench(
     benchmark_id: str,
-    env_id: str | None,
+    env_id: str,
     seed: int = 0,
     /,
     benchmark_specific: dict[str, Any] = {},
-)
+) -> BenchmarkEnvironment
 ```
 
 ## `make_vec()`
 
 ```python
-make_vec(envs: list[BenchmarkEnvironment])
+make_vec(envs: list[BenchmarkEnvironment]) -> BenchmarkVecEnvironment
 ```
 
-Wraps a list of single benchmark environments in a vector-style environment that can step and reset in parallel.
+Wraps a list of single benchmark environments in a vector-style environment that can `step` and `reset` in parallel.
 
 ## `BenchmarkEnvironment`
 
@@ -45,4 +61,4 @@ Main public methods:
 
 - `step(actions: list[list[float]])`
 - `reset(seeds: list[int])`
-
+- `close()`
