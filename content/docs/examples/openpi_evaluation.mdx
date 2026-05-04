@@ -90,7 +90,7 @@ This verifies that Simulac returns the image keys and image format expected by t
 import numpy as np
 from simulac.gym_style import get_env_list, init_bench
 
-benchmark_id = "Tektonian/Robocasa"
+benchmark_id = "Tektonian/RobocasaPre"
 env_id = get_env_list(benchmark_id)[0]
 
 env = init_bench(benchmark_id, env_id)
@@ -122,7 +122,7 @@ This checks image keys and formats using parallel execution: it creates `num_env
 import numpy as np
 from simulac.gym_style import get_env_list, init_bench, make_vec
 
-benchmark_id = "Tektonian/Robocasa"
+benchmark_id = "Tektonian/RobocasaPre"
 env_path = get_env_list(benchmark_id)[0]
 env_id = env_path
 num_envs = 2
